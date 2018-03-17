@@ -5,11 +5,12 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/zjstraus/name-dyndns/log"
 )
 
 const (
@@ -26,12 +27,13 @@ type API struct {
 
 // DNSRecord contains information about a Name.com DNS record.
 type DNSRecord struct {
-	RecordID   string `json:"record_id"`
-	Name       string `json:"name"`
-	Type       string `json:"type"`
-	Content    string `json:"content"`
-	TTL        string `json:"ttl"`
-	CreateDate string `json:"create_date"`
+	RecordID   int `json:"id"`
+	DomainName string      `json:"domainName"`
+	Host       string      `json:"host"`
+	FQDN       string      `json:"fqdn"`
+	Type       string      `json:"type"`
+	Answer     string      `json:"answer"`
+	TTL        int `json:"ttl"`
 }
 
 type resultResponse struct {
@@ -62,14 +64,15 @@ func (api API) performRequest(method, url string, body io.Reader) (response []by
 	var client http.Client
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
+		log.Logger.Printf("Error building HTTP request: %s", err)
 		return nil, err
 	}
 
-	req.Header.Add("api-username", api.username)
-	req.Header.Add("api-token", api.token)
+	req.SetBasicAuth(api.username, api.token)
 
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Logger.Printf("Error making HTTP request %s", err)
 		return nil, err
 	}
 
@@ -79,44 +82,33 @@ func (api API) performRequest(method, url string, body io.Reader) (response []by
 
 // CreateDNSRecord creates a DNS record for a given domain. The name
 // field in DNSRecord is in the format [hostname].[domainname]
-func (api API) CreateDNSRecord(domain string, record DNSRecord) error {
+func (api API) CreateDNSRecord(record DNSRecord) error {
 	// We need to transform name -> hostname for JSON.
 	var body struct {
-		Hostname string `json:"hostname"`
+		Host     string `json:"host"`
 		Type     string `json:"type"`
-		Content  string `json:"content"`
-		TTL      string `json:"ttl"`
+		Answer   string `json:"answer"`
+		TTL      int    `json:"ttl"`
 	}
 
-	body.Hostname = record.Name
+	body.Host = record.Host
 	body.Type = record.Type
-	body.Content = record.Content
+	body.Answer = record.Answer
 	body.TTL = record.TTL
 
-	b, err := json.Marshal(body)
-	if err != nil {
-		return err
+	b, jsonerr := json.Marshal(body)
+	if jsonerr != nil {
+		return jsonerr
 	}
 
-	resp, err := api.performRequest(
+	_, apierr := api.performRequest(
 		"POST",
-		fmt.Sprintf("%s%s%s", api.baseURL, "api/dns/create/", domain),
+		fmt.Sprintf("%s%s%s%s", api.baseURL, "v4/domains/", record.DomainName, "/records"),
 		bytes.NewBuffer(b),
 	)
-	if err != nil {
-		return err
-	}
-
-	var result struct {
-		Result resultResponse
-	}
-
-	err = json.Unmarshal(resp, &result)
-	if err != nil {
-		return err
-	}
-	if result.Result.Code != 100 {
-		return errors.New(result.Result.Message)
+	if apierr != nil {
+		log.Logger.Printf("Error in Create request: %s", apierr)
+		return apierr
 	}
 
 	return nil
@@ -124,36 +116,15 @@ func (api API) CreateDNSRecord(domain string, record DNSRecord) error {
 
 // DeleteDNSRecord deletes a DNS record for a given domain. The recordID can
 // be retreived from GetDNSRecords.
-func (api API) DeleteDNSRecord(domain, recordID string) error {
-	var body struct {
-		RecordID string `json:"record_id"`
-	}
-	body.RecordID = recordID
-
-	b, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
-
-	resp, err := api.performRequest(
-		"POST",
-		fmt.Sprintf("%s%s%s", api.baseURL, "api/dns/delete/", domain),
-		bytes.NewBuffer(b),
+func (api API) DeleteDNSRecord(domain string, recordID int) error {
+	_, err := api.performRequest(
+		"DELETE",
+		fmt.Sprintf("%s%s%s%s%d", api.baseURL, "v4/domains/", domain, "/", recordID),
+		nil,
 	)
 	if err != nil {
+		log.Logger.Printf("Error in Delete request: %s", err)
 		return err
-	}
-
-	var result struct {
-		Result resultResponse
-	}
-
-	err = json.Unmarshal(resp, &result)
-	if err != nil {
-		return err
-	}
-	if result.Result.Code != 100 {
-		return errors.New(result.Result.Message)
 	}
 
 	return nil
@@ -163,7 +134,7 @@ func (api API) DeleteDNSRecord(domain, recordID string) error {
 func (api API) GetDNSRecords(domain string) (records []DNSRecord, err error) {
 	resp, err := api.performRequest(
 		"GET",
-		fmt.Sprintf("%s%s%s", api.baseURL, "api/dns/list/", domain),
+		fmt.Sprintf("%s%s%s%s", api.baseURL, "v4/domains/", domain, "/records"),
 		nil,
 	)
 
@@ -172,16 +143,12 @@ func (api API) GetDNSRecords(domain string) (records []DNSRecord, err error) {
 	}
 
 	var result struct {
-		Result  resultResponse
 		Records []DNSRecord
 	}
 
 	err = json.Unmarshal(resp, &result)
 	if err != nil {
 		return nil, err
-	}
-	if result.Result.Code != 100 {
-		return nil, errors.New(result.Result.Message)
 	}
 
 	return result.Records, nil
