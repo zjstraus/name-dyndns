@@ -119,7 +119,7 @@ func (api API) CreateDNSRecord(record DNSRecord) error {
 func (api API) DeleteDNSRecord(domain string, recordID int) error {
 	_, err := api.performRequest(
 		"DELETE",
-		fmt.Sprintf("%s%s%s%s%d", api.baseURL, "v4/domains/", domain, "/", recordID),
+		fmt.Sprintf("%s%s%s%s%d", api.baseURL, "v4/domains/", domain, "/records/", recordID),
 		nil,
 	)
 	if err != nil {
