@@ -92,7 +92,7 @@ func runConfig(c api.Config, daemon bool) {
 				if err != nil {
 					log.Logger.Printf("Failed to update record %d [%s] with IP: %s\n\t%s\n", r.RecordID, r.Host, ip, err)
 				} else {
-					log.Logger.Printf("Updated record %s [%s] with IP: %s\n", r.RecordID, r.Host, ip)
+					log.Logger.Printf("Updated record %d [%s] with IP: %s\n", r.RecordID, r.Host, ip)
 				}
 			}
 		}
