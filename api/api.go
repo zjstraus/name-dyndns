@@ -36,11 +36,6 @@ type DNSRecord struct {
 	TTL        int `json:"ttl"`
 }
 
-type resultResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
 // NewNameAPI constructs a new Name.com API. If dev is true, then
 // the API uses the development API, instead of the production API.
 func NewNameAPI(username, token string, dev bool) API {
