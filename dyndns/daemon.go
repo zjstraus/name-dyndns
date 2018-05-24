@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zjstraus/name-dyndns/api"
-	"github.com/zjstraus/name-dyndns/log"
+	"../api"
+	"../log"
 )
 
 var wg sync.WaitGroup
