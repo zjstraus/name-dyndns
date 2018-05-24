@@ -21,7 +21,6 @@ func filterConfigs(configs []api.Config, dev bool) []api.Config {
 
 func main() {
 	configPath := flag.String("config", "./config.json", "Specify the configuration file")
-	daemon := flag.Bool("daemon", false, "Operate in daemon mode.")
 	dev := flag.Bool("dev", false, "Use development configurations instead.")
 	logFile := flag.String("log", "", "Specify a logfile. If no file is provided, uses stdout.")
 	flag.Parse()
@@ -56,5 +55,5 @@ func main() {
 	configs = filterConfigs(configs, *dev)
 
 	log.Logger.Printf("Successfully loaded %d configs\n", len(configs))
-	dyndns.Run(configs, *daemon)
+	dyndns.Run(configs)
 }

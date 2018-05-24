@@ -38,7 +38,7 @@ func updateDNSRecord(a api.API, newRecord api.DNSRecord) error {
 	return a.CreateDNSRecord(newRecord)
 }
 
-func runConfig(c api.Config, daemon bool) {
+func runConfig(c api.Config) {
 	defer wg.Done()
 
 	a := api.NewAPIFromConfig(c)
@@ -46,14 +46,8 @@ func runConfig(c api.Config, daemon bool) {
 		ip, err := GetExternalIP()
 		if err != nil {
 			log.Logger.Print("Failed to retreive IP: ")
-			if daemon {
-				log.Logger.Printf("Will retry in %d seconds...\n", c.Interval)
-				time.Sleep(time.Duration(c.Interval) * time.Second)
-				continue
-			} else {
-				log.Logger.Println("Giving up.")
-				break
-			}
+			log.Logger.Printf("Will retry in %d seconds...\n", c.Interval)
+			time.Sleep(time.Duration(c.Interval) * time.Second)
 		}
 
 		// GetRecords retrieves a list of DNSRecords,
@@ -63,14 +57,9 @@ func runConfig(c api.Config, daemon bool) {
 		records, err := a.GetDNSRecords(c.Domain)
 		if err != nil {
 			log.Logger.Printf("Failed to retreive records for %s:\n\t%s\n", c.Domain, err)
-			if daemon {
-				log.Logger.Printf("Will retry in %d seconds...\n", c.Interval)
-				time.Sleep(time.Duration(c.Interval) * time.Second)
-				continue
-			} else {
-				log.Logger.Print("Giving up.")
-				break
-			}
+			log.Logger.Printf("Will retry in %d seconds...\n", c.Interval)
+			time.Sleep(time.Duration(c.Interval) * time.Second)
+			continue
 		}
 
 		for _, r := range records {
@@ -98,10 +87,6 @@ func runConfig(c api.Config, daemon bool) {
 		}
 
 		log.Logger.Println("Update complete.")
-		if !daemon {
-			log.Logger.Println("Non daemon mode, stopping.")
-			return
-		}
 		log.Logger.Printf("Will update again in %d seconds.\n", c.Interval)
 
 		time.Sleep(time.Duration(c.Interval) * time.Second)
@@ -115,10 +100,10 @@ func runConfig(c api.Config, daemon bool) {
 //
 // Each configuration represents a domain with
 // multiple hostnames.
-func Run(configs []api.Config, daemon bool) {
+func Run(configs []api.Config) {
 	for _, config := range configs {
 		wg.Add(1)
-		go runConfig(config, daemon)
+		go runConfig(config)
 	}
 
 	wg.Wait()
