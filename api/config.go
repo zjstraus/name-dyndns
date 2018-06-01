@@ -1,8 +1,9 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"strconv"
+	"os"
+	"strings"
 )
 
 // Config represents the configuration for a
@@ -23,20 +24,22 @@ type Config struct {
 
 // LoadConfigs loads configurations from a file. The configuration
 // is stored as an array of JSON serialized Config structs.
-func LoadConfigs(path string) ([]Config, error) {
-	var configs struct {
-		Configs []Config
+func LoadConfig() (Config) {
+	devValue, _ := strconv.ParseBool(os.Getenv("NAME_DEV_MODE"))
+	hostnameVals := strings.Split(os.Getenv("NAME_HOSTNAMES"), ",")
+	domainValue := os.Getenv("NAME_DOMAIN")
+	intervalValue, _ := strconv.ParseInt(os.Getenv("NAME_INTERVAL"), 10,32)
+	tokenValue := os.Getenv("NAME_TOKEN")
+	usernameValue := os.Getenv("NAME_USER")
+
+	config := Config{
+		Dev:       devValue,
+		Domain:    domainValue,
+		Hostnames: hostnameVals,
+		Interval:  int(intervalValue),
+		Token:     tokenValue,
+		Username:  usernameValue,
 	}
 
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(file, &configs)
-	if err != nil {
-		return nil, err
-	}
-
-	return configs.Configs, nil
+	return config
 }

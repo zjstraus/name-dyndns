@@ -17,22 +17,18 @@ can be requested from https://www.name.com/reseller/apply.
 Once you have your API key, all you must do is setup `config.json`. An example
 `config.json` file can be found in `api/config_test.json`.
 
-## Command Line Arguments
+## Running
 
-By default, running name-dyndns will run a one-time update, using `./config.json`
-as a configuration file, and stdout as a log output. However, these can be configured. For example:
+name-dyndns will run in an infinite loop, constantly making updates. Configuration is loaded from environment variables.
+By default all logging is printed to stdout, but a log file can be configured wih the ```-log``` commandline parameter.
 
-```
-./name-dyndns -daemon=true -dev=true -log="/var/log/name-dyndns/out.log" -config="~/name_config.json"
-```
-
-This will run name-dyndns in daemon mode for dev configurations, outputting to `/var/log/name-dyndns/out.log`, using the configuration file `~/name_config.json`
-
-A detailed usage can be found by running:
-
-```
-./name-dyndns --help
-```
+### Configuration variables
+* NAME_DEV_MODE - TRUE to run against the name.com dev server
+* NAME_HOSTNAMES - Comma seperated list of hostnames to update
+* NAME_DOMAIN - Base domain name
+* NAME_INTERVAL - Interval (seconds) between updates
+* NAME_TOKEN - Name.com API token
+* NAME_USER - Name.com API username
 
 ## Error Handling
 

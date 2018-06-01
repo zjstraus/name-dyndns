@@ -100,11 +100,8 @@ func runConfig(c api.Config) {
 //
 // Each configuration represents a domain with
 // multiple hostnames.
-func Run(configs []api.Config) {
-	for _, config := range configs {
-		wg.Add(1)
-		go runConfig(config)
-	}
+func Run(config api.Config) {
+	runConfig(config)
 
 	wg.Wait()
 }

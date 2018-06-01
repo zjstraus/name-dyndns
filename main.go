@@ -20,8 +20,6 @@ func filterConfigs(configs []api.Config, dev bool) []api.Config {
 }
 
 func main() {
-	configPath := flag.String("config", "./config.json", "Specify the configuration file")
-	dev := flag.Bool("dev", false, "Use development configurations instead.")
 	logFile := flag.String("log", "", "Specify a logfile. If no file is provided, uses stdout.")
 	flag.Parse()
 
@@ -41,19 +39,13 @@ func main() {
 
 	log.Init(file)
 
-	configs, err := api.LoadConfigs(*configPath)
-	if err != nil {
-		log.Logger.Fatalln("Error loading config:", err)
+	config := api.LoadConfig()
+
+
+	if config.Domain == "" || len(config.Hostnames) == 0 {
+		log.Logger.Fatalf("Empty configuration detected. Exiting.")
 	}
 
-	for _, config := range configs {
-		if config.Domain == "" || len(config.Hostnames) == 0 {
-			log.Logger.Fatalf("Empty configuration detected. Exiting.")
-		}
-	}
-
-	configs = filterConfigs(configs, *dev)
-
-	log.Logger.Printf("Successfully loaded %d configs\n", len(configs))
-	dyndns.Run(configs)
+	log.Logger.Printf("Detected configuration for %s", config.Domain)
+	dyndns.Run(config)
 }
