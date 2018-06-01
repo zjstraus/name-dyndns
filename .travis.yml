@@ -14,5 +14,5 @@ services:
 
 after_success:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker build . -t $DOCKER_USER/name-dyndns
-    - docker push $DOCKER_USER/name-dyndns
+    - docker build . -t $DOCKER_USERNAME/name-dyndns
+    - docker push $DOCKER_USERNAME/name-dyndns
