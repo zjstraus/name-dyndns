@@ -10,7 +10,7 @@ import (
 // raw IP string can be retreived. It is exported
 // for the intent of modification.
 var (
-	Urls = []string{"http://myexternalip.com/raw"}
+	Urls = []string{"http://myexternalip.com/raw", "https://api.ipify.org"}
 )
 
 func tryMirror(url string) (string, error) {
