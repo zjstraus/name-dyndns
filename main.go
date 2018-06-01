@@ -9,16 +9,6 @@ import (
 	"os"
 )
 
-func filterConfigs(configs []api.Config, dev bool) []api.Config {
-	for i := 0; i < len(configs); i++ {
-		if configs[i].Dev != dev {
-			configs = append(configs[:i], configs[i+1:]...)
-		}
-	}
-
-	return configs
-}
-
 func main() {
 	logFile := flag.String("log", "", "Specify a logfile. If no file is provided, uses stdout.")
 	flag.Parse()
