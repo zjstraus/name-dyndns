@@ -1,12 +1,12 @@
-# name-dyndns [![Build Status](https://travis-ci.org/mfycheng/name-dyndns.svg?branch=master)](https://travis-ci.org/mfycheng/name-dyndns) [![GoDoc](https://godoc.org/github.com/mfycheng/name-dyndns?status.svg)](https://godoc.org/github.com/mfycheng/name-dyndns)
+# name-dyndns [![Build Status](https://travis-ci.org/zjstraus/name-dyndns.svg?branch=master)](https://travis-ci.org/zjstraus/name-dyndns) [![GoDoc](https://godoc.org/github.com/zjstraus/name-dyndns?status.svg)](https://godoc.org/github.com/zjstraus/name-dyndns)
 Client that automatically updates name.com DNS records.
 
 ## Getting name-dyndns
 
 Since name-dyndns has no external dependencies, you can get it simply by:
 
-```go
-go get github.com/mfycheng/name-dyndns
+```bash
+go get github.com/zjstraus/name-dyndns
 ```
 
 ## Requirements
