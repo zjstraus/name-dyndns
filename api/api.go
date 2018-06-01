@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"../log"
+	"github.com/zjstraus/name-dyndns/log"
 )
 
 const (
