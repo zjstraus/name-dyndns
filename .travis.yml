@@ -7,3 +7,12 @@ go: 1.6
 branches:
     only:
         - master
+
+
+services:
+    - docker
+
+after_success:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker build . -t $DOCKER_USER/name-dyndns
+    - docker push $DOCKER_USER/name-dyndns
