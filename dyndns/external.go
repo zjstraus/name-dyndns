@@ -2,6 +2,7 @@ package dyndns
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -36,9 +37,9 @@ func GetExternalIP() (string, error) {
 	for _, url := range Urls {
 		resp, err := tryMirror(url)
 		if err == nil {
-			return resp, err
+			return resp, nil
 		} else {
-			return "", err
+			fmt.Printf("Error in request: %s", err.Error())
 		}
 	}
 

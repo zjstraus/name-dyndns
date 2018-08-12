@@ -24,8 +24,8 @@ func TestGetExternalIP(t *testing.T) {
 	// provide 2 bad IPs, and 2 correct ones,
 	// in that order.
 	Urls = make([]string, 4)
-	Urls[0] = ""
-	Urls[1] = "1.4.5.6"
+	Urls[0] = "https://192.0.2.1"
+	Urls[1] = "https://192.0.2.2"
 	Urls[2] = fmt.Sprintf("%s/%s", server.URL, "correct")
 	Urls[3] = fmt.Sprintf("%s/%s", server.URL, "incorrect")
 
