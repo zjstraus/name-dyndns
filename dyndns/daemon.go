@@ -46,6 +46,7 @@ func runConfig(c api.Config) {
 		ip, err := GetExternalIP()
 		if err != nil {
 			log.Logger.Print("Failed to retreive IP: ")
+			log.Logger.Print(err)
 			log.Logger.Printf("Will retry in %d seconds...\n", c.Interval)
 			time.Sleep(time.Duration(c.Interval) * time.Second)
 		}

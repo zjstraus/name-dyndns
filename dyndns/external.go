@@ -37,6 +37,8 @@ func GetExternalIP() (string, error) {
 		resp, err := tryMirror(url)
 		if err == nil {
 			return resp, err
+		} else {
+			return "", err
 		}
 	}
 
